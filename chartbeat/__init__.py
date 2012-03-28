@@ -9,10 +9,9 @@ except ImportError:
 try:
     from urllib.parse import urljoin
 except ImportError:
-    from urlparse import urljoin
+    from urlparse import urljoin  # noqa
 
 from datetime import datetime
-from collections import Iterable
 
 
 class ChartbeatException(Exception):
@@ -58,7 +57,6 @@ class Chartbeat(object):
         response = requests.get(endpoint, params=params, hooks={
             'args': chartbeat_hook
         })
-        print(response.url, response.content)
         try:
             response.raise_for_status()
         except requests.RequestException as e:
