@@ -42,21 +42,20 @@ class Chartbeat(object):
         self.host = host
 
     def _request(self, endpoint, **params):
-        def chartbeat_hook(args):
-            args['params'].update({
-                'apikey': self.apikey,
-                'host': self.host
-            })
-            for key, value in list(args['params'].items()):
-                if isinstance(value, datetime):
-                    args['params'][key] = int(time.mktime(value.timetuple()))
-                if isinstance(value, list):
-                    args['params'][key] = ",".join([str(v) for v in value])
-            args['url'] = urljoin("http://api.chartbeat.com", args['url'])
-            return args
-        response = requests.get(endpoint, params=params, hooks={
-            'args': chartbeat_hook
+        params.update({
+            'apikey': self.apikey,
+            'host': self.host
         })
+        for key, value in list(params.items()):
+            if isinstance(value, datetime):
+                params[key] = int(time.mktime(value.timetuple()))
+            if isinstance(value, list):
+                params[key] = ",".join([str(v) for v in value])
+
+        endpoint = urljoin("http://api.chartbeat.com", endpoint)
+
+        response = requests.get(endpoint, params=params)
+
         try:
             response.raise_for_status()
         except requests.RequestException as e:
@@ -64,8 +63,15 @@ class Chartbeat(object):
             if hasattr(e, 'response'):
                 exception.response = e.response
             raise exception
-        if response.content and "application/json" in response.headers['Content-Type']:
-            return json.loads(response.content.decode('utf-8'))
+
+        if hasattr(response, 'json'):
+            if callable(response.json):
+                return response.json()
+            else:
+                return response.json
+        else:
+            if response.content and "application/json" in response.headers['Content-Type']:
+                return json.loads(response.content.decode('utf-8'))
         return response.content
 
     def histogram(self, keys, breaks, path=None):
