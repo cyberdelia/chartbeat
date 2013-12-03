@@ -46,7 +46,7 @@ class Chartbeat(object):
             'apikey': self.apikey,
             'host': self.host
         })
-        for key, value in list(params.iteritems()):
+        for key, value in list(params.items()):
             if isinstance(value, datetime):
                 params[key] = int(time.mktime(value.timetuple()))
             if isinstance(value, list):
