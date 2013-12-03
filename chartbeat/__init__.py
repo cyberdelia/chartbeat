@@ -63,8 +63,15 @@ class Chartbeat(object):
             if hasattr(e, 'response'):
                 exception.response = e.response
             raise exception
-        if response.content and "application/json" in response.headers['Content-Type']:
-            return json.loads(response.content.decode('utf-8'))
+
+        if hasattr(response, 'json'):
+            if callable(response.json):
+                return response.json()
+            else:
+                return response.json
+        else:
+            if response.content and "application/json" in response.headers['Content-Type']:
+                return json.loads(response.content.decode('utf-8'))
         return response.content
 
     def histogram(self, keys, breaks, path=None):
