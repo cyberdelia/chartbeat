@@ -43,7 +43,7 @@ class Chartbeat(object):
         self.api_version = api_version
 
         if self.api_version is not None and self.api_version.isdigit():
-            self.api_version = 'v{}'.format(self.api_version)
+            self.api_version = 'v%s' % (self.api_version)
 
     def _request(self, endpoint, **params):
         params.update({
@@ -57,7 +57,7 @@ class Chartbeat(object):
                 params[key] = ",".join([str(v) for v in value])
 
         if 'live' in endpoint and self.api_version is not None:
-            endpoint = '{}/{}/'.format(endpoint, self.api_version)
+            endpoint = '%s/%s/' % (endpoint, self.api_version)
 
         endpoint = urljoin("http://api.chartbeat.com", endpoint)
 
