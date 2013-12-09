@@ -37,9 +37,13 @@ class Chartbeat(object):
     WRITE = 'W'  # Number of people writing.
     IDLE = 'I'  # Number of people idle.
 
-    def __init__(self, apikey, host):
+    def __init__(self, apikey, host, api_version=None):
         self.apikey = apikey
         self.host = host
+        self.api_version = api_version
+
+        if self.api_version is not None and self.api_version.isdigit():
+            self.api_version = 'v%s' % (self.api_version)
 
     def _request(self, endpoint, **params):
         params.update({
@@ -51,6 +55,9 @@ class Chartbeat(object):
                 params[key] = int(time.mktime(value.timetuple()))
             if isinstance(value, list):
                 params[key] = ",".join([str(v) for v in value])
+
+        if 'live' in endpoint and self.api_version is not None:
+            endpoint = '%s/%s/' % (endpoint, self.api_version)
 
         endpoint = urljoin("http://api.chartbeat.com", endpoint)
 

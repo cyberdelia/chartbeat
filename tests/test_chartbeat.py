@@ -25,3 +25,9 @@ class ChartbeatTest(TestCase):
         data = self.beat.quickstats(path="/")
         self.assertTrue("toprefs" in data)
         self.assertTrue("visit" in data)
+
+    def test_api_version(self):
+        self.beat = Chartbeat("317a25eccba186e0f6b558f45214c0e7", "avc.com", api_version='3')
+        data = self.beat.quickstats(path="/")
+        self.assertTrue("toprefs" in data)
+        self.assertTrue("visit" in data)
